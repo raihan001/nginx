@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  nginx:
+    image: andrewnk/alpine-nginx-modsec
+    container_name: nginx
+    ports:
+      - 80:80
+    networks:
+      - web
+    volumes:
+      - app:/usr/share/nginx/html
+
+  php:
+    image: andrewnk/base-alpine-php
+    container_name: php
+    networks:
+      - web
+    volumes:
+      - app:/var/www/html
+
+volumes:
+  app:
+
+networks:
+  web:
