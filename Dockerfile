@@ -23,7 +23,7 @@ RUN set -ex; \
         findutils \
         make \
         nghttp2 \
-        libuuid-devel \
+        libuuid \
         sudo; \
     \
     apk add --update --no-cache -t .nginx-build-deps \
@@ -42,7 +42,7 @@ RUN set -ex; \
         libxslt-dev \
         linux-headers \
         pcre-dev \
-        libuuid-devel \
+        libuuid \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
@@ -61,7 +61,7 @@ RUN set -ex; \
         rsync \
         sed \
         yajl \
-        libuuid-devel \
+        libuuid \
         yajl-dev; \
     \
     # @todo download from main repo when updated to alpine 3.10.
