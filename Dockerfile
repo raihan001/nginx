@@ -1,4 +1,4 @@
-FROM alpine:latest AS builder
+FROM  wodby/alpine:3.12  AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 ENV NGINX_VER="1.18.0" \
