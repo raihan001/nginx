@@ -10,9 +10,9 @@ RUN apk update && apk --no-cache add --virtual .build-deps gcc libc-dev make ope
 
 #Mod security
 RUN cd $HOME && \
-    git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity && \
+    git clone --depth 1 -b v3.0.4 --single-branch https://github.com/SpiderLabs/ModSecurity && \
     cd $HOME/ModSecurity && \
-    git submodule init && \
+    git submodule update --init --recursive && \
     git submodule update && \
     ./build.sh && \
     ./configure --with-lmdb && \
@@ -26,7 +26,6 @@ RUN cd $HOME && \
     export MODSEC_BRANCH="v3.0.4" && export GEO_DB_RELEASE="2020-07" && export OWASP_BRANCH="v3.2/master" && \
     curl -O https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz && \
     tar xvzf nginx-$NGINX_VERSION.tar.gz && \
-    git clone -b master --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git && \
     git clone --recursive https://github.com/google/ngx_brotli.git && \
     git clone -b master --depth 1 https://github.com/leev/ngx_http_geoip2_module.git && \
     git clone -b $OWASP_BRANCH --depth 1 https://github.com/SpiderLabs/owasp-modsecurity-crs && \
