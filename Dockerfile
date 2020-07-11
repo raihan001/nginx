@@ -216,7 +216,7 @@ RUN set -ex; \
         /var/cache/apk/* ; \
     \
     mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; \
-    cp /usr/local/nginx/conf/mime.types /etc/nginx/; \
+    cp /usr/local/nginx/conf/mime.types /etc/nginx/; 
 
 # Move to fresh image
 FROM nginx:1.18.0-alpine
