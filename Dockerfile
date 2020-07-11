@@ -37,7 +37,7 @@ RUN cd $HOME && \
 # Build
 RUN export NGINX_VERSION="1.18.0" && cd $HOME/nginx-$NGINX_VERSION/ && ls -l $HOME && \
     curl https://sh.rustup.rs -sSf | sh -s -- -y -q && \
-    export PATH="$HOME/.cargo/bin:$PATH" && \
+    source $HOME/.cargo/env && \
     ./configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
