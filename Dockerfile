@@ -1,4 +1,4 @@
-FROM alpine:edge AS builder
+FROM alpine:latest AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 ENV NGINX_VER="1.18.0" \
@@ -24,6 +24,7 @@ RUN set -ex; \
         make \
         nghttp2 \
         libuuid \
+        g++ \
         sudo; \
     \
     apk add --update --no-cache -t .nginx-build-deps \
@@ -43,6 +44,7 @@ RUN set -ex; \
         linux-headers \
         pcre-dev \
         libuuid \
+        g++ \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
