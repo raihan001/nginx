@@ -1,6 +1,8 @@
 FROM alpine:edge AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
+ARG NGINX_VER
+
 ENV NGINX_VER="1.18.0" \
     APP_ROOT="/var/www/html" \
     FILES_DIR="/mnt/files" \
