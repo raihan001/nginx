@@ -34,7 +34,7 @@ RUN cd $HOME && \
     wget -O - https://download.db-ip.com/free/dbip-country-lite-$GEO_DB_RELEASE.mmdb.gz | gzip -d > /etc/nginx/geoip/dbip-country-lite.mmdb
 
 # Build
-RUN export NGINX_VERSION="1.18.0" && cd $HOME/nginx-$NGINX_VERSION/ && \
+RUN export NGINX_VERSION="1.18.0" && cd $HOME/nginx-$NGINX_VERSION/ && ls -l $HOME && \
     curl https://sh.rustup.rs -sSf | sh -s -- -y -q && \
     export PATH="$HOME/.cargo/bin:$PATH" && \
     ./configure \
@@ -85,7 +85,6 @@ RUN export NGINX_VERSION="1.18.0" && cd $HOME/nginx-$NGINX_VERSION/ && \
     --add-module=$HOME/ngx_brotli && \
     --add-dynamic-module=$HOME/ModSecurity-nginx \
     --add-dynamic-module=$HOME/ngx_http_geoip2_module \
-    ls -l $HOME \
     make -j2 && make -j2 modules && \
     make install
 
