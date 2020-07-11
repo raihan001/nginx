@@ -2,7 +2,7 @@ FROM alpine:edge AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 # Add builder tools
-RUN apk update && apk --no-cache add --virtual .build-deps gcc libc-dev make openssl-dev pcre-dev maxminddb \
+RUN apk update && apk --no-cache add --virtual .build-deps gcc libc-dev make openssl-dev pcre-dev libmaxminddb \
     zlib-dev automake perl linux-headers curl gnupg libxslt-dev gd-dev geoip-dev perl-dev lua-dev lmdb-dev \    
     autoconf libtool go g++ clang git wget curl patch cmake g++ yajl-dev pkgconf libcurl apache2-dev apr-dev \
     apr-util-dev build-base gettext-dev gperf icu-dev libjpeg-turbo-dev libpng-dev libressl-dev py-setuptools \
