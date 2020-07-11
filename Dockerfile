@@ -27,6 +27,7 @@ RUN cd $HOME && \
     curl -O https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz && \
     tar xvzf nginx-$NGINX_VERSION.tar.gz && \
     git clone --recursive https://github.com/google/ngx_brotli.git && \
+    git clone -b master --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git && \
     git clone -b master --depth 1 https://github.com/leev/ngx_http_geoip2_module.git && \
     git clone -b $OWASP_BRANCH --depth 1 https://github.com/SpiderLabs/owasp-modsecurity-crs && \
     mkdir -p /etc/nginx/geoip && \
