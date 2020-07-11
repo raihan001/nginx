@@ -1,4 +1,4 @@
-FROM alpine:latest AS builder
+FROM alpine:edge AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 # Add builder tools
