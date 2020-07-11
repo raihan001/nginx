@@ -10,7 +10,7 @@ RUN apk update && apk --no-cache add --virtual .build-deps gcc libc-dev make ope
 
 #Mod security
 RUN cd $HOME && \
-    git clone --depth 1 -b v3.0.4 --single-branch https://github.com/SpiderLabs/ModSecurity && \
+    git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity && \
     cd $HOME/ModSecurity && \
     git submodule update --init --recursive && \
     git submodule update && \
