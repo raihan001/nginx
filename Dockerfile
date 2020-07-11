@@ -1,6 +1,12 @@
 FROM alpine:edge AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
+ENV NGINX_VER="1.18.0" \
+    APP_ROOT="/var/www/html" \
+    FILES_DIR="/mnt/files" \
+    NGINX_VHOST_PRESET="html"
+
+
 RUN set -ex; \
     \
     nginx_up_ver="0.9.1"; \
