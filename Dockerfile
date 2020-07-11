@@ -1,91 +1,174 @@
 FROM alpine:edge AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
-# Add builder tools
-RUN apk update && apk --no-cache add --virtual .build-deps gcc libc-dev make openssl-dev pcre-dev libmaxminddb \
-    zlib-dev automake perl linux-headers curl gnupg libxslt-dev gd-dev geoip-dev perl-dev lua-dev lmdb-dev \    
-    autoconf libtool go g++ clang git wget curl patch cmake g++ yajl-dev pkgconf libcurl apache2-dev apr-dev \
-    apr-util-dev build-base gettext-dev gperf icu-dev libjpeg-turbo-dev libpng-dev libressl-dev py-setuptools \
-    zlib-dev
+ENV NGINX_VER="1.18.0" \
+    APP_ROOT="/var/www/html"
 
-#Mod security
-RUN cd $HOME && \
-    git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity && \
-    cd $HOME/ModSecurity && \
-    git submodule update --init --recursive && \
-    git submodule update && \
-    ./build.sh && \
-    ./configure --with-lmdb && \
-    make -j2 && \
-    make -j2 install && \
-    make -j2 clean
-
-# Clone Repo
-RUN cd $HOME && \
-    export NGINX_PATH="/etc/nginx" && export NGINX_VERSION="1.18.0" && \
-    export MODSEC_BRANCH="v3.0.4" && export GEO_DB_RELEASE="2020-04" && export OWASP_BRANCH="v3.2/master" && \
-    curl -O https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz && \
-    tar xvzf nginx-$NGINX_VERSION.tar.gz && \
-    git clone --recursive https://github.com/google/ngx_brotli.git && \
-    git clone -b master --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git && \
-    git clone -b master --depth 1 https://github.com/leev/ngx_http_geoip2_module.git && \
-    git clone -b $OWASP_BRANCH --depth 1 https://github.com/SpiderLabs/owasp-modsecurity-crs && \
-    mkdir -p /etc/nginx/geoip && \
-    wget -O - https://download.db-ip.com/free/dbip-city-lite-$GEO_DB_RELEASE.mmdb.gz | gzip -d > /etc/nginx/geoip/dbip-city-lite.mmdb && \
-    wget -O - https://download.db-ip.com/free/dbip-country-lite-$GEO_DB_RELEASE.mmdb.gz | gzip -d > /etc/nginx/geoip/dbip-country-lite.mmdb
-
-# Build
-RUN export NGINX_VERSION="1.18.0" && cd $HOME/nginx-$NGINX_VERSION/ && ls -l $HOME && \
-    curl https://sh.rustup.rs -sSf | sh -s -- -y -q && \
-    source $HOME/.cargo/env && \
+RUN set -ex; \
+    \
+    nginx_up_ver="0.9.1"; \
+    ngx_pagespeed_ver="1.13.35.2"; \
+    mod_pagespeed_ver="1.13.35.2"; \
+    ngx_modsecurity_ver="1.0.0"; \
+    modsecurity_ver="3.0.3"; \
+    owasp_crs_ver="3.1.0"; \
+    \
+    addgroup -S nginx; \
+    adduser -S -D -H -h /var/cache/nginx -s /sbin/nologin -G nginx nginx; \
+    \
+    apk add --update --no-cache -t .tools \
+        findutils \
+        make \
+        nghttp2 \
+        sudo; \
+    \
+    apk add --update --no-cache -t .nginx-build-deps \
+        apr-dev \
+        apr-util-dev \
+        build-base \
+        gd-dev \
+        git \
+        gnupg \
+        gperf \
+        icu-dev \
+        libjpeg-turbo-dev \
+        libpng-dev \
+        libressl-dev \
+        libtool \
+        libxslt-dev \
+        linux-headers \
+        pcre-dev \
+        zlib-dev; \
+     \
+     apk add --no-cache -t .libmodsecurity-build-deps \
+        autoconf \
+        automake \
+        bison \
+        curl \
+        flex \
+        g++ \
+        git \
+        libmaxminddb-dev \
+        libstdc++ \
+        libtool \
+        libxml2-dev \
+        pcre-dev \
+        rsync \
+        sed \
+        yajl \
+        yajl-dev; \
+    \
+    # @todo download from main repo when updated to alpine 3.10.
+    apk add -U --no-cache -t .nginx-edge-build-deps -X http://dl-cdn.alpinelinux.org/alpine/edge/main/ brotli-dev; \
+    # Modsecurity lib.
+    cd /tmp; \
+    git clone --depth 1 -b "v${modsecurity_ver}" --single-branch https://github.com/SpiderLabs/ModSecurity; \
+    cd ModSecurity; \
+    git submodule init;  \
+    git submodule update; \
+    ./build.sh; \
+    ./configure --disable-doxygen-doc --disable-doxygen-html; \
+    make -j$(getconf _NPROCESSORS_ONLN); \
+    make install;  \
+    mkdir -p /etc/nginx/modsecurity/; \
+    mv modsecurity.conf-recommended /etc/nginx/modsecurity/recommended.conf;  \
+    sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsecurity/recommended.conf; \
+    cp unicode.mapping /etc/nginx/modsecurity/; \
+    rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
+    \
+    # Brotli.
+    cd /tmp; \
+    git clone --depth 1 --single-branch https://github.com/google/ngx_brotli; \
+    \
+    # Get ngx modsecurity module.
+    mkdir -p /tmp/ngx_http_modsecurity_module; \
+    ver="${ngx_modsecurity_ver}"; \
+    url="https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${ver}/modsecurity-nginx-v${ver}.tar.gz"; \
+    wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_modsecurity_module; \
+    \
+    # OWASP.
+    wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${owasp_crs_ver}.tar.gz" | tar xz -C /tmp; \
+    cd /tmp/owasp-modsecurity-crs-*; \
+    sed -i "s#SecRule REQUEST_COOKIES|#SecRule REQUEST_URI|REQUEST_COOKIES|#" rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf; \
+    mkdir -p /etc/nginx/modsecurity/crs/; \
+    mv crs-setup.conf.example /etc/nginx/modsecurity/crs/setup.conf; \
+    mv rules /etc/nginx/modsecurity/crs; \
+    \
+    # Get ngx pagespeed module.
+    git clone -b "v${ngx_pagespeed_ver}-stable" \
+          --recurse-submodules \
+          --shallow-submodules \
+          --depth=1 \
+          -c advice.detachedHead=false \
+          -j$(getconf _NPROCESSORS_ONLN) \
+          https://github.com/apache/incubator-pagespeed-ngx.git \
+          /tmp/ngx_pagespeed; \
+    \
+    # Get psol for alpine.
+    url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
+    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed; \
+    \
+    # Get ngx uploadprogress module.
+    mkdir -p /tmp/ngx_http_uploadprogress_module; \
+    url="https://github.com/masterzen/nginx-upload-progress-module/archive/v${nginx_up_ver}.tar.gz"; \
+    wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_uploadprogress_module; \
+    \
+    # Download nginx.
+    curl -fSL "https://nginx.org/download/nginx-${NGINX_VER}.tar.gz" -o /tmp/nginx.tar.gz; \
+    curl -fSL "https://nginx.org/download/nginx-${NGINX_VER}.tar.gz.asc"  -o /tmp/nginx.tar.gz.asc; \
+    GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8; \
+    tar zxf /tmp/nginx.tar.gz -C /tmp; \
+    \
+    cd "/tmp/nginx-${NGINX_VER}"; \
     ./configure \
-    --prefix=/etc/nginx \
-    --sbin-path=/usr/sbin/nginx \
-    --modules-path=/usr/lib/nginx/modules \
-    --conf-path=/etc/nginx/nginx.conf \
-    --error-log-path=/var/log/nginx/error.log \
-    --http-log-path=/var/log/nginx/access.log \
-    --pid-path=/var/run/nginx.pid \
-    --lock-path=/var/run/nginx.lock \
-    --http-client-body-temp-path=/var/cache/nginx/client_temp \
-    --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-    --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-    --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
-    --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-    --user=nginx \
-    --group=nginx \
-    --with-http_ssl_module \
-    --with-http_realip_module \
-    --with-http_addition_module \
-    --with-http_sub_module \
-    --with-http_dav_module \
-    --with-http_flv_module \
-    --with-http_mp4_module \
-    --with-http_gunzip_module \
-    --with-http_gzip_static_module \
-    --with-http_random_index_module \
-    --with-http_secure_link_module \
-    --with-http_stub_status_module \
-    --with-http_auth_request_module \
-    --with-http_xslt_module=dynamic \
-    --with-http_image_filter_module=dynamic \
-    --with-http_geoip_module=dynamic \
-    --with-http_perl_module=dynamic \
-    --with-threads \
-    --with-stream \
-    --with-stream_ssl_module \
-    --with-stream_ssl_preread_module \
-    --with-stream_realip_module \
-    --with-stream_geoip_module=dynamic \
-    --with-http_slice_module \
-    --with-mail \
-    --with-mail_ssl_module \
-    --with-compat \
-    --with-file-aio \
-    --with-http_v2_module \
-    --add-module=$HOME/ngx_brotli \
-    --add-dynamic-module=$HOME/ModSecurity-nginx \
-    --add-dynamic-module=$HOME/ngx_http_geoip2_module && \
+        --prefix=/etc/nginx \
+        --sbin-path=/usr/sbin/nginx \
+        --modules-path=/usr/lib/nginx/modules \
+        --conf-path=/etc/nginx/nginx.conf \
+        --pid-path=/var/run/nginx/nginx.pid \
+        --lock-path=/var/run/nginx/nginx.lock \
+        --error-log-path=/var/log/nginx/error.log \
+        --http-log-path=/var/log/nginx/access.log \
+        --http-client-body-temp-path=/var/cache/nginx/client_temp \
+        --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+        --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+        --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+        --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+        --user=nginx \
+        --group=nginx \
+        --with-compat \
+        --with-file-aio \
+        --with-http_addition_module \
+        --with-http_auth_request_module \
+        --with-http_dav_module \
+        --with-http_flv_module \
+        --with-http_gunzip_module \
+        --with-http_gzip_static_module \
+        --with-http_image_filter_module=dynamic \
+        --with-http_mp4_module \
+        --with-http_random_index_module \
+        --with-http_realip_module \
+        --with-http_secure_link_module \
+        --with-http_slice_module \
+        --with-http_ssl_module \
+        --with-http_stub_status_module \
+        --with-http_sub_module \
+        --with-http_v2_module \
+        --with-http_xslt_module=dynamic \
+        --with-ipv6 \
+        --with-ld-opt="-Wl,-z,relro,--start-group -lapr-1 -laprutil-1 -licudata -licuuc -lpng -lturbojpeg -ljpeg" \
+        --with-mail \
+        --with-mail_ssl_module \
+        --with-pcre-jit \
+        --with-stream \
+        --with-stream_ssl_module \
+        --with-stream_ssl_preread_module \
+        --with-stream_realip_module \
+        --with-threads \
+        --add-module=/tmp/ngx_http_uploadprogress_module \
+        --add-module=/tmp/ngx_brotli \
+        --add-dynamic-module=/tmp/ngx_pagespeed \
+        --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     make -j2 && make -j2 modules && \
     make install
 
