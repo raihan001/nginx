@@ -23,7 +23,7 @@ RUN cd $HOME && \
 # Clone Repo
 RUN cd $HOME && \
     export NGINX_PATH="/etc/nginx" && export NGINX_VERSION="1.18.0" && \
-    export MODSEC_BRANCH="v3.0.4" && export GEO_DB_RELEASE="2020-07" && export OWASP_BRANCH="v3.2/master" && \
+    export MODSEC_BRANCH="v3.0.4" && export GEO_DB_RELEASE="2020-04" && export OWASP_BRANCH="v3.2/master" && \
     curl -O https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz && \
     tar xvzf nginx-$NGINX_VERSION.tar.gz && \
     git clone --recursive https://github.com/google/ngx_brotli.git && \
