@@ -2,7 +2,9 @@ FROM alpine:edge AS builder
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 ENV NGINX_VER="1.18.0" \
-    APP_ROOT="/var/www/html"
+    APP_ROOT="/var/www/html" \
+    FILES_DIR="/mnt/files" \
+    NGINX_VHOST_PRESET="html"
 
 RUN set -ex; \
     \
@@ -121,7 +123,7 @@ RUN set -ex; \
     \
     cd "/tmp/nginx-${NGINX_VER}"; \
     ./configure \
-        --prefix=/etc/nginx \
+        --prefix=/usr/share/nginx \
         --sbin-path=/usr/sbin/nginx \
         --modules-path=/usr/lib/nginx/modules \
         --conf-path=/etc/nginx/nginx.conf \
@@ -169,12 +171,50 @@ RUN set -ex; \
         --add-module=/tmp/ngx_brotli \
         --add-dynamic-module=/tmp/ngx_pagespeed \
         --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
-    make -j2 && make -j2 modules && \
-    make install
-
-RUN apk del .build-deps && rm -rf $HOME/*
-RUN mkdir /etc/nginx/sites-enabled /etc/nginx/ssl && \
-    cp /usr/local/nginx/conf/mime.types /etc/nginx/
+     \
+    make -j$(getconf _NPROCESSORS_ONLN); \
+    make install; \
+    mkdir -p /usr/share/nginx/modules; \
+    \
+    install -d "${APP_ROOT}" \
+        "${FILES_DIR}" \
+        /etc/nginx/conf.d \
+        /var/cache/nginx \
+        /var/lib/nginx; \
+    \
+    touch /etc/nginx/upstream.conf; \
+    \
+    install -g nginx -o nginx -d \
+        /var/cache/ngx_pagespeed \
+        /pagespeed_static \
+        /ngx_pagespeed_beacon; \
+    \
+    install -m 400 -d /etc/nginx/pki; \
+    strip /usr/sbin/nginx*; \
+    strip /usr/lib/nginx/modules/*.so; \
+    strip /usr/local/lib/libmodsecurity.so*; \
+    \
+    for i in /usr/lib/nginx/modules/*.so; do ln -s "${i}" /usr/share/nginx/modules/; done; \
+    \
+    runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/local/modsecurity/lib/*.so /usr/lib/nginx/modules/*.so /tmp/envsubst \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --no-cache --virtual .nginx-rundeps $runDeps; \
+    \
+    echo "find ${APP_ROOT} ${FILES_DIR} -maxdepth 0 -uid 0 -type d -exec chown root:root {} +" > /usr/local/bin/init_volumes; \
+    chmod +x /usr/local/bin/init_volumes; \
+    \
+    apk del --purge .nginx-build-deps .nginx-edge-build-deps .libmodsecurity-build-deps; \
+    rm -rf \
+        /tmp/* \
+        /usr/local/modsecurity \
+        /var/cache/apk/* ; \
+    \
+    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; \
+    cp /usr/local/nginx/conf/mime.types /etc/nginx/; \
 
 # Move to fresh image
 FROM nginx:1.18.0-alpine
@@ -182,9 +222,14 @@ LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 COPY --from=builder /usr/sbin/nginx /usr/sbin/
 COPY --from=builder /usr/lib/nginx /usr/lib/
-COPY --from=builder /etc/nginx/* /etc/nginx/
+COPY --from=builder /etc/nginx/ /etc/nginx/
 COPY --from=builder /usr/local/modsecurity /etc/nginx/
 COPY --from=builder /usr/local/owasp-modsecurity-crs /etc/nginx/owasp-modsecurity-crs
+
+# Copy Pagespeed
+COPY --from=builder /var/cache/ngx_pagespeed /var/cache/ngx_pagespeed
+COPY --from=builder /pagespeed_static /pagespeed_static
+COPY --from=builder /ngx_pagespeed_beacon /ngx_pagespeed_beacon
 
 # Copy local config files into the image
 COPY errors /usr/share/nginx/errors
@@ -192,8 +237,7 @@ COPY conf/nginx/ /etc/nginx/
 COPY conf/modsec/ /etc/nginx/modsec/
 COPY conf/owasp/ /usr/local/owasp-modsecurity-crs/
 
-RUN apk add --no-cache tzdata pcre libgcc redis yajl libstdc++ libmaxminddb-dev lmdb-dev libxml2-dev curl-dev && \
-    addgroup -S nginx && \
+RUN addgroup -S nginx && \
     adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx && \
     mkdir -p /var/log/nginx && \
     touch /var/log/nginx/access.log /var/log/nginx/error.log && \
