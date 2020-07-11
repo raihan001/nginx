@@ -83,7 +83,7 @@ RUN export NGINX_VERSION="1.18.0" && cd $HOME/nginx-$NGINX_VERSION/ && ls -l $HO
     --with-compat \
     --with-file-aio \
     --with-http_v2_module \
-    --add-module=$HOME/ngx_brotli && \
+    --add-module=$HOME/ngx_brotli \
     --add-dynamic-module=$HOME/ModSecurity-nginx \
     --add-dynamic-module=$HOME/ngx_http_geoip2_module \
     make -j2 && make -j2 modules && \
