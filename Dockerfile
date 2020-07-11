@@ -203,6 +203,6 @@ RUN apk add --no-cache tzdata pcre libgcc redis yajl libstdc++ libmaxminddb-dev 
     chown nginx: /etc/nginx/ -R
 
 RUN nginx -t && nginx -v
-WORKDIR /usr/share/nginx/html
+WORKDIR /var/www/html
 
 EXPOSE 80 443
