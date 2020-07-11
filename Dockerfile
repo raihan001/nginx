@@ -1,11 +1,13 @@
-FROM  wodby/alpine:3.12  AS builder
-LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
+ARG BASE_IMAGE_TAG=3.12
 
-ENV NGINX_VER="1.18.0" \
+FROM wodby/alpine:${BASE_IMAGE_TAG}
+
+ARG NGINX_VER=1.18.0
+
+ENV NGINX_VER="${NGINX_VER}" \
     APP_ROOT="/var/www/html" \
     FILES_DIR="/mnt/files" \
     NGINX_VHOST_PRESET="html"
-
 
 RUN set -ex; \
     \
@@ -23,9 +25,6 @@ RUN set -ex; \
         findutils \
         make \
         nghttp2 \
-        libuuid \
-        util-linux \
-        g++ \
         sudo; \
     \
     apk add --update --no-cache -t .nginx-build-deps \
@@ -44,9 +43,6 @@ RUN set -ex; \
         libxslt-dev \
         linux-headers \
         pcre-dev \
-        libuuid \
-        util-linux \
-        g++ \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
@@ -65,8 +61,6 @@ RUN set -ex; \
         rsync \
         sed \
         yajl \
-        libuuid \
-        util-linux \
         yajl-dev; \
     \
     # @todo download from main repo when updated to alpine 3.10.
@@ -114,12 +108,10 @@ RUN set -ex; \
           -j$(getconf _NPROCESSORS_ONLN) \
           https://github.com/apache/incubator-pagespeed-ngx.git \
           /tmp/ngx_pagespeed; \
-          ls -l /tmp/ngx_pagespeed/; \
     \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
-    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed/; \
-    ls -l /tmp/ngx_pagespeed/; \
+    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed; \
     \
     # Get ngx uploadprogress module.
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
@@ -134,7 +126,7 @@ RUN set -ex; \
     \
     cd "/tmp/nginx-${NGINX_VER}"; \
     ./configure \
-        --prefix=/etc/nginx \
+        --prefix=/usr/share/nginx \
         --sbin-path=/usr/sbin/nginx \
         --modules-path=/usr/lib/nginx/modules \
         --conf-path=/etc/nginx/nginx.conf \
@@ -185,7 +177,7 @@ RUN set -ex; \
     \
     make -j$(getconf _NPROCESSORS_ONLN); \
     make install; \
-    mkdir -p /etc/nginx/modules; \
+    mkdir -p /usr/share/nginx/modules; \
     \
     install -d "${APP_ROOT}" \
         "${FILES_DIR}" \
