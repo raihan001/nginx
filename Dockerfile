@@ -24,6 +24,7 @@ RUN set -ex; \
         make \
         nghttp2 \
         libuuid \
+        util-linux \
         g++ \
         sudo; \
     \
@@ -44,6 +45,7 @@ RUN set -ex; \
         linux-headers \
         pcre-dev \
         libuuid \
+        util-linux \
         g++ \
         zlib-dev; \
      \
@@ -64,6 +66,7 @@ RUN set -ex; \
         sed \
         yajl \
         libuuid \
+        util-linux \
         yajl-dev; \
     \
     # @todo download from main repo when updated to alpine 3.10.
