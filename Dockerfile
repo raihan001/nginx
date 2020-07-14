@@ -216,8 +216,7 @@ RUN mkdir -p /tmp/ngx_http_uploadprogress_module; \
         /tmp/* \
         /usr/local/modsecurity \
         /var/cache/apk/* ; \
-    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; \
-    \
+    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; 
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
 
 # Copy local config files into the image
