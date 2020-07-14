@@ -111,7 +111,7 @@ RUN set -ex; \
     \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
-    wget -qO- "${url}" | tar -xvf -C /tmp/ngx_pagespeed/; \
+    wget -qO- "${url}" | tar -zvxf -C /tmp/ngx_pagespeed/; \
     \
     # Get ngx uploadprogress module.
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
