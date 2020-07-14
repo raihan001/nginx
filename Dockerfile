@@ -1,6 +1,6 @@
 ARG BASE_IMAGE_TAG=edge
 
-FROM wodby/alpine:${BASE_IMAGE_TAG}
+FROM alpine:${BASE_IMAGE_TAG}
 
 ARG NGINX_VER="1.18.0"
 
