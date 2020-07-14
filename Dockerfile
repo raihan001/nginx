@@ -176,6 +176,7 @@ RUN set -ex; \
         --add-dynamic-module=/tmp/ngx_pagespeed \
         --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     \
+    cat /tmp/nginx-1.18.0/objs/autoconf.err; \
     make -j$(getconf _NPROCESSORS_ONLN); \
     make modules; \
     make install; \
