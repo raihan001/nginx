@@ -112,14 +112,11 @@ RUN set -ex; \
           -c advice.detachedHead=false \
           -j2 \
           https://github.com/apache/incubator-pagespeed-ngx.git \
-          /tmp/ngx_pagespeed; \
-    \
+          /tmp/ngx_pagespeed;
     # Get psol for alpine.
-    url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
-    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed/; \
-    \
+COPY psol/ /tmp/ngx_pagespeed/;
     # Get ngx uploadprogress module.
-    mkdir -p /tmp/ngx_http_uploadprogress_module; \
+RUN mkdir -p /tmp/ngx_http_uploadprogress_module; \
     url="https://github.com/masterzen/nginx-upload-progress-module/archive/v${nginx_up_ver}.tar.gz"; \
     wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_uploadprogress_module; \
     \
