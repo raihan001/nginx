@@ -1,6 +1,6 @@
-ARG BASE_IMAGE_TAG=3.12
+ARG BASE_IMAGE_TAG="latest"
 
-FROM wodby/alpine:${BASE_IMAGE_TAG}
+FROM andycungkrinxxx/base-build:${BASE_IMAGE_TAG}
 
 ARG NGINX_VER=1.18.0
 
