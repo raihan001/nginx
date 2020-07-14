@@ -63,42 +63,6 @@ RUN set -ex; \
         yajl \
         yajl-dev; \
     \
-    # @todo download from main repo when updated to alpine 3.10.
-    apk add -U --no-cache -t .nginx-edge-build-deps -X http://dl-cdn.alpinelinux.org/alpine/edge/main/ brotli-dev; \
-    # Modsecurity lib.
-    cd /tmp; \
-    git clone --depth 1 -b "v${modsecurity_ver}" --single-branch https://github.com/SpiderLabs/ModSecurity; \
-    cd ModSecurity; \
-    git submodule init;  \
-    git submodule update; \
-    ./build.sh; \
-    ./configure --disable-doxygen-doc --disable-doxygen-html; \
-    make -j$(getconf _NPROCESSORS_ONLN); \
-    make install;  \
-    mkdir -p /etc/nginx/modsecurity/; \
-    mv modsecurity.conf-recommended /etc/nginx/modsecurity/recommended.conf;  \
-    sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsecurity/recommended.conf; \
-    cp unicode.mapping /etc/nginx/modsecurity/; \
-    rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
-    \
-    # Brotli.
-    cd /tmp; \
-    git clone --depth 1 --single-branch https://github.com/google/ngx_brotli; \
-    \
-    # Get ngx modsecurity module.
-    mkdir -p /tmp/ngx_http_modsecurity_module; \
-    ver="${ngx_modsecurity_ver}"; \
-    url="https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${ver}/modsecurity-nginx-v${ver}.tar.gz"; \
-    wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_modsecurity_module; \
-    \
-    # OWASP.
-    wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${owasp_crs_ver}.tar.gz" | tar xz -C /tmp; \
-    cd /tmp/owasp-modsecurity-crs-*; \
-    sed -i "s#SecRule REQUEST_COOKIES|#SecRule REQUEST_URI|REQUEST_COOKIES|#" rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf; \
-    mkdir -p /etc/nginx/modsecurity/crs/; \
-    mv crs-setup.conf.example /etc/nginx/modsecurity/crs/setup.conf; \
-    mv rules /etc/nginx/modsecurity/crs; \
-    \
     # Get ngx pagespeed module.
     git clone -b "v${ngx_pagespeed_ver}-stable" \
           --recurse-submodules \
@@ -112,12 +76,7 @@ RUN set -ex; \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
     wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed/; \
-    \
-    # Get ngx uploadprogress module.
-    mkdir -p /tmp/ngx_http_uploadprogress_module; \
-    url="https://github.com/masterzen/nginx-upload-progress-module/archive/v${nginx_up_ver}.tar.gz"; \
-    wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_uploadprogress_module; \
-    \
+    
     # Download nginx.
     curl -fSL "https://nginx.org/download/nginx-${NGINX_VER}.tar.gz" -o /tmp/nginx.tar.gz; \
     curl -fSL "https://nginx.org/download/nginx-${NGINX_VER}.tar.gz.asc"  -o /tmp/nginx.tar.gz.asc; \
@@ -125,6 +84,8 @@ RUN set -ex; \
     tar zxf /tmp/nginx.tar.gz -C /tmp; \
     \
     ls -l /tmp/; \
+    ls -l /tmp/ngx_pagespeed/psol/; \
+    ls -l /tmp/ngx_pagespeed/psol/include; \
     cd "/tmp/nginx-${NGINX_VER}"; \
     ./configure \
         --prefix=/usr/share/nginx \
@@ -169,10 +130,10 @@ RUN set -ex; \
 		--with-stream_ssl_preread_module \
 		--with-stream_realip_module \
         --with-threads \
-        --add-module=/tmp/ngx_http_uploadprogress_module \
-        --add-module=/tmp/ngx_brotli \
-        --add-dynamic-module=/tmp/ngx_pagespeed \
-        --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
+        #--add-module=/tmp/ngx_http_uploadprogress_module \
+        #--add-module=/tmp/ngx_brotli \
+        --add-dynamic-module=/tmp/ngx_pagespeed; \
+        #--add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     \
     make -j$(getconf _NPROCESSORS_ONLN); \
     make modules; \
