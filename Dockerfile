@@ -1,6 +1,6 @@
 ARG BASE_IMAGE_TAG=3.8
 
-FROM alpine:${BASE_IMAGE_TAG} AS builder
+FROM alpine:${BASE_IMAGE_TAG}
 
 ARG NGINX_VER="1.18.0"
 
@@ -202,7 +202,7 @@ RUN mkdir -p /tmp/ngx_http_uploadprogress_module; \
     \
     for i in /usr/lib/nginx/modules/*.so; do ln -s "${i}" /usr/share/nginx/modules/; done; \
     \
-    runDeps="$( \
+	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/local/modsecurity/lib/*.so /usr/lib/nginx/modules/*.so /tmp/envsubst \
 			| tr ',' '\n' \
 			| sort -u \
@@ -210,31 +210,15 @@ RUN mkdir -p /tmp/ngx_http_uploadprogress_module; \
 	)"; \
 	apk add --no-cache --virtual .nginx-rundeps $runDeps; \
     \
-    echo "find ${APP_ROOT} ${FILES_DIR} -maxdepth 0 -uid 0 -type d -exec chown root:root {} +" > /usr/local/bin/init_volumes; \
-    chmod +x /usr/local/bin/init_volumes; \
-    \
+    # Script to fix volumes permissions via sudo.
     apk del --purge .nginx-build-deps .nginx-edge-build-deps .libmodsecurity-build-deps; \
     rm -rf \
         /tmp/* \
         /usr/local/modsecurity \
         /var/cache/apk/* ; \
+    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; \
     \
-    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; 
-
-# Move to fresh image
-FROM nginx:1.18.0-alpine
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>"
-
-COPY --from=builder /usr/sbin/nginx /usr/sbin/
-COPY --from=builder /usr/lib/nginx /usr/lib/
-COPY --from=builder /etc/nginx/ /etc/nginx/
-COPY --from=builder /usr/local/modsecurity /etc/nginx/
-COPY --from=builder /usr/local/owasp-modsecurity-crs /etc/nginx/owasp-modsecurity-crs
-
-# Copy Pagespeed
-COPY --from=builder /var/cache/ngx_pagespeed /var/cache/ngx_pagespeed
-COPY --from=builder /pagespeed_static /pagespeed_static
-COPY --from=builder /ngx_pagespeed_beacon /ngx_pagespeed_beacon
 
 # Copy local config files into the image
 COPY errors /usr/share/nginx/errors
