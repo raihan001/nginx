@@ -73,7 +73,7 @@ RUN set -ex; \
           -c advice.detachedHead=false \
           -j$(getconf _NPROCESSORS_ONLN) \
           https://github.com/apache/incubator-pagespeed-ngx.git \
-          /tmp/ngx_pagespeed; \
+          /tmp/ngx_pagespeed; ls -l /tmp/;\
     \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
