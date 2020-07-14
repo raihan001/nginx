@@ -2,7 +2,7 @@ ARG BASE_IMAGE_TAG="latest"
 
 FROM andycungkrinxxx/base-build:${BASE_IMAGE_TAG}
 
-ARG NGINX_VER=1.18.0
+ARG NGINX_VER=1.19.0
 
 ENV NGINX_VER="${NGINX_VER}" \
     APP_ROOT="/var/www/html" \
