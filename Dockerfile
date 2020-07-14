@@ -43,6 +43,7 @@ RUN set -ex; \
         libxslt-dev \
         linux-headers \
         pcre-dev \
+        openssl-dev \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
@@ -121,7 +122,6 @@ RUN set -ex; \
         --with-http_v2_module \
 		--with-http_xslt_module=dynamic \
         --with-ipv6 \
-        --with-ld-opt="-Wl,-z,relro,--start-group -lapr-1 -laprutil-1 -licudata -licuuc -lpng -lturbojpeg -ljpeg" \
         --with-mail \
         --with-mail_ssl_module \
         --with-pcre-jit \
