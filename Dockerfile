@@ -198,7 +198,7 @@ RUN mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
         --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     \
     #make -j'nproc'; \
-    make install -j'nproc'; \
+    make install -j2; \
     mkdir -p /usr/share/nginx/modules; \
     \
     install -g nginx -o nginx -d \
