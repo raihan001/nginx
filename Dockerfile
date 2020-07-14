@@ -116,14 +116,10 @@ RUN set -ex; \
     \
     # Build pagespeed
     cd /tmp/ngx_pagespeed; \
-    cp patches/modpagespeed/*.patch ./ ;
-RUN for i in *.patch; do printf "\r\nApplying patch ${i%%.*}\r\n"; patch -p1 < $i || exit 1; done
-RUN ./setup.py install; \
-    cd /tmp/ngx_pagespeed; \
     build/gyp_chromium --depth=. \
     -D use_system_libs=1 \
     && \
-    cd /usr/src/modpagespeed/pagespeed/automatic && \
+    cd /tmp/ngx_pagespeed/pagespeed/automatic && \
     make psol BUILDTYPE=Release \
               CFLAGS+="-I/usr/include/apr-1" \
               CXXFLAGS+="-I/usr/include/apr-1 -DUCHAR_TYPE=uint16_t" \
@@ -152,6 +148,8 @@ RUN mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
     ./configure \
         --prefix=/usr/share/nginx \
         --sbin-path=/usr/sbin/nginx \
+        --error-log-path=/var/log/nginx/error.log \
+        --http-log-path=/var/log/nginx/access.log \
         --modules-path=/usr/lib/nginx/modules \
         --conf-path=/etc/nginx/nginx.conf \
         --pid-path=/var/run/nginx/nginx.pid \
