@@ -219,8 +219,7 @@ RUN mkdir -p /tmp/ngx_http_uploadprogress_module; \
         /usr/local/modsecurity \
         /var/cache/apk/* ; \
     \
-    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; \
-    cp /usr/local/nginx/conf/mime.types /etc/nginx/; 
+    mkdir /etc/nginx/sites-enabled /etc/nginx/ssl; 
 
 # Move to fresh image
 FROM nginx:1.18.0-alpine
