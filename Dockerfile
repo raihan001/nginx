@@ -1,6 +1,6 @@
 ARG BASE_IMAGE_TAG=3.8
 
-FROM alpine:${BASE_IMAGE_TAG}
+FROM alpine:${BASE_IMAGE_TAG} AS builder
 
 ARG NGINX_VER="1.18.0"
 
