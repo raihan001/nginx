@@ -47,7 +47,9 @@ RUN set -ex; \
         linux-headers \
         tar \
         ca-certificates \
-        geoip-dev \
+        geoip-dev \ 
+        lua \
+        lmdb \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
