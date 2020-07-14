@@ -101,7 +101,6 @@ RUN set -ex; \
     # Get ngx pagespeed module.
     git clone -b "v${ngx_pagespeed_ver}-stable" \
           --recurse-submodules \
-          --shallow-submodules \
           --depth=1 \
           -c advice.detachedHead=false \
           -j$(getconf _NPROCESSORS_ONLN) \
