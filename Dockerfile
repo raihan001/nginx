@@ -21,11 +21,6 @@ RUN set -ex; \
     addgroup -S nginx; \
     adduser -S -D -H -h /var/cache/nginx -s /sbin/nologin -G nginx nginx; \
     \
-	addgroup -g 1000 -S arsyatech; \
-	adduser -u 1000 -D -S -s /bin/bash -G arsyatech arsyatech; \
-	sed -i '/^arsyatech/s/!/*/' /etc/shadow; \
-	echo "PS1='\w\$ '" >> /home/arsyatech/.bashrc; \
-    \
     apk add --update --no-cache -t .tools \
         findutils \
         make \
@@ -182,7 +177,7 @@ RUN set -ex; \
     make install; \
     mkdir -p /usr/share/nginx/modules; \
     \
-    install -g arsyatech -o arsyatech -d \
+    install -g nginx -o nginx -d \
         "${APP_ROOT}" \
         "${FILES_DIR}" \
         /etc/nginx/conf.d \
