@@ -21,6 +21,11 @@ RUN set -ex; \
     addgroup -S nginx; \
     adduser -S -D -H -h /var/cache/nginx -s /sbin/nologin -G nginx nginx; \
     \
+	addgroup -g 1000 -S arsyatech; \
+	adduser -u 1000 -D -S -s /bin/bash -G arsyatech arsyatech; \
+	sed -i '/^arsyatech/s/!/*/' /etc/shadow; \
+	echo "PS1='\w\$ '" >> /home/arsyatech/.bashrc; \
+    \
     apk add --update --no-cache -t .tools \
         findutils \
         make \
@@ -121,7 +126,7 @@ RUN set -ex; \
     # Download nginx.
     curl -fSL "https://nginx.org/download/nginx-${NGINX_VER}.tar.gz" -o /tmp/nginx.tar.gz; \
     curl -fSL "https://nginx.org/download/nginx-${NGINX_VER}.tar.gz.asc"  -o /tmp/nginx.tar.gz.asc; \
-    GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8; \
+    GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 gpg_verify /tmp/nginx.tar.gz.asc /tmp/nginx.tar.gz; \
     tar zxf /tmp/nginx.tar.gz -C /tmp; \
     \
     cd "/tmp/nginx-${NGINX_VER}"; \
@@ -132,8 +137,6 @@ RUN set -ex; \
         --conf-path=/etc/nginx/nginx.conf \
         --pid-path=/var/run/nginx/nginx.pid \
         --lock-path=/var/run/nginx/nginx.lock \
-        --error-log-path=/var/log/nginx/error.log \
-        --http-log-path=/var/log/nginx/access.log \
         --http-client-body-temp-path=/var/cache/nginx/client_temp \
         --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
         --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
@@ -149,17 +152,17 @@ RUN set -ex; \
         --with-http_flv_module \
         --with-http_gunzip_module \
         --with-http_gzip_static_module \
-        --with-http_image_filter_module=dynamic \
+		--with-http_image_filter_module=dynamic \
         --with-http_mp4_module \
         --with-http_random_index_module \
         --with-http_realip_module \
         --with-http_secure_link_module \
-        --with-http_slice_module \
+		--with-http_slice_module \
         --with-http_ssl_module \
         --with-http_stub_status_module \
         --with-http_sub_module \
         --with-http_v2_module \
-        --with-http_xslt_module=dynamic \
+		--with-http_xslt_module=dynamic \
         --with-ipv6 \
         --with-ld-opt="-Wl,-z,relro,--start-group -lapr-1 -laprutil-1 -licudata -licuuc -lpng -lturbojpeg -ljpeg" \
         --with-mail \
@@ -167,8 +170,8 @@ RUN set -ex; \
         --with-pcre-jit \
         --with-stream \
         --with-stream_ssl_module \
-        --with-stream_ssl_preread_module \
-        --with-stream_realip_module \
+		--with-stream_ssl_preread_module \
+		--with-stream_realip_module \
         --with-threads \
         --add-module=/tmp/ngx_http_uploadprogress_module \
         --add-module=/tmp/ngx_brotli \
@@ -179,7 +182,8 @@ RUN set -ex; \
     make install; \
     mkdir -p /usr/share/nginx/modules; \
     \
-    install -d "${APP_ROOT}" \
+    install -g arsyatech -o arsyatech -d \
+        "${APP_ROOT}" \
         "${FILES_DIR}" \
         /etc/nginx/conf.d \
         /var/cache/nginx \
