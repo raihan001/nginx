@@ -175,6 +175,7 @@ RUN set -ex; \
         --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     \
     make -j$(getconf _NPROCESSORS_ONLN); \
+    make modules; \
     make install; \
     mkdir -p /usr/share/nginx/modules; \
     \
