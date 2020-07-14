@@ -1,8 +1,8 @@
-ARG BASE_IMAGE_TAG="latest"
+ARG BASE_IMAGE_TAG="3.12"
 
-FROM andycungkrinxxx/base-build:${BASE_IMAGE_TAG}
+FROM wodby/alpine:${BASE_IMAGE_TAG}
 
-ARG NGINX_VER=1.18.0
+ARG NGINX_VER="1.18.0"
 
 ENV NGINX_VER="${NGINX_VER}" \
     APP_ROOT="/var/www/html" \
@@ -20,7 +20,6 @@ RUN set -ex; \
     \
     addgroup -S nginx; \
     adduser -S -D -H -h /var/cache/nginx -s /sbin/nologin -G nginx nginx; \
-    \
     apk add --update --no-cache -t .tools \
         findutils \
         make \
@@ -111,7 +110,7 @@ RUN set -ex; \
     \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
-    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed/; \
+    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed; \
     \
     # Get ngx uploadprogress module.
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
@@ -124,9 +123,6 @@ RUN set -ex; \
     GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 gpg_verify /tmp/nginx.tar.gz.asc /tmp/nginx.tar.gz; \
     tar zxf /tmp/nginx.tar.gz -C /tmp; \
     \
-    ls -l /tmp/; \
-    ls -l /tmp/ngx_pagespeed/psol/; \
-    ls -l /tmp/ngx_pagespeed/psol/include; \
     cd "/tmp/nginx-${NGINX_VER}"; \
     ./configure \
         --prefix=/usr/share/nginx \
@@ -176,9 +172,7 @@ RUN set -ex; \
         --add-dynamic-module=/tmp/ngx_pagespeed \
         --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     \
-    cat /tmp/nginx-1.18.0/objs/autoconf.err; \
     make -j$(getconf _NPROCESSORS_ONLN); \
-    make modules; \
     make install; \
     mkdir -p /usr/share/nginx/modules; \
     \
