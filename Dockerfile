@@ -64,7 +64,6 @@ RUN set -ex; \
         yajl-dev; \
     \
     # @todo download from main repo when updated to alpine 3.10.
-    apk add -U --no-cache -t .nginx-edge-build-deps -X http://dl-cdn.alpinelinux.org/alpine/edge/main/ brotli-dev; \
     # Get ngx pagespeed module.
     git clone -b "v${ngx_pagespeed_ver}-stable" \
           --recurse-submodules \
