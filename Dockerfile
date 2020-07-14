@@ -220,9 +220,7 @@ COPY conf/nginx/ /etc/nginx/
 COPY conf/modsec/ /etc/nginx/modsec/
 COPY conf/owasp/ /usr/local/owasp-modsecurity-crs/
 
-RUN addgroup -S nginx && \
-    adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx && \
-    mkdir -p /var/log/nginx && \
+RUN mkdir -p /var/log/nginx && \
     touch /var/log/nginx/access.log /var/log/nginx/error.log && \
     chown nginx: /var/log/nginx/access.log /var/log/nginx/error.log && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
