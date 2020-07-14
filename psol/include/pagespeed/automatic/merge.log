@@ -1,0 +1,4 @@
+Waiting for 127 parallel extractions to complete.
+Adding 1109 files ...
+ranlib /usr/src/modpagespeed/pagespeed/automatic/pagespeed_automatic.a.dirty
+-rw-r--r--    1 root     root      31020380 Feb  4 11:31 /usr/src/modpagespeed/pagespeed/automatic/pagespeed_automatic.a.dirty
