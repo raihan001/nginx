@@ -115,16 +115,7 @@ RUN set -ex; \
           /tmp/ngx_pagespeed; \
     \
     # Build pagespeed
-    cd /tmp/ngx_pagespeed; \
-    build/gyp_chromium --depth=. \
-    -D use_system_libs=1 \
-    && \
-    cd /tmp/ngx_pagespeed/pagespeed/automatic && \
-    make psol BUILDTYPE=Release \
-              CFLAGS+="-I/usr/include/apr-1" \
-              CXXFLAGS+="-I/usr/include/apr-1 -DUCHAR_TYPE=uint16_t" \
-              -j2; 
-RUN mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
+    mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
     mkdir -p /tmp/ngx_pagespeed/psol/include/out/Release && \
     cp -R pagespeed/automatic/pagespeed_automatic.a /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
     cp -R net pagespeed testing third_party url /tmp/ngx_pagespeed/psol/include/; \
