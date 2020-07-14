@@ -114,15 +114,9 @@ RUN set -ex; \
           https://github.com/apache/incubator-pagespeed-ngx.git \
           /tmp/ngx_pagespeed; \
     \
-    # Build pagespeed
-    mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
-    mkdir -p /tmp/ngx_pagespeed/psol/include/out/Release && \
-    cp -R pagespeed/automatic/pagespeed_automatic.a /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
-    cp -R net pagespeed testing third_party url /tmp/ngx_pagespeed/psol/include/; \
-    \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
-    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed; \
+    wget -qO- "${url}" | tar xz -C /tmp/ngx_pagespeed/; \
     \
     # Get ngx uploadprogress module.
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
