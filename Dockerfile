@@ -5,7 +5,7 @@ FROM alpine:${BASE_IMAGE_TAG}
 ARG NGINX_VER="1.18.0"
 
 ENV NGINX_VER="${NGINX_VER}" \
-    APP_ROOT="/var/www/html" 
+    APP_ROOT="/var/www/html"
 
 RUN set -ex; \
     \
@@ -48,7 +48,6 @@ RUN set -ex; \
         tar \
         ca-certificates \
         geoip-dev \
-
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
@@ -111,7 +110,7 @@ RUN set -ex; \
           --shallow-submodules \
           --depth=1 \
           -c advice.detachedHead=false \
-          -j'nproc' \
+          -j2 \
           https://github.com/apache/incubator-pagespeed-ngx.git \
           /tmp/ngx_pagespeed; \
     \
@@ -128,7 +127,7 @@ RUN ./setup.py install; \
     make psol BUILDTYPE=Release \
               CFLAGS+="-I/usr/include/apr-1" \
               CXXFLAGS+="-I/usr/include/apr-1 -DUCHAR_TYPE=uint16_t" \
-              -j'nproc'; 
+              -j2; 
 RUN mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
     mkdir -p /tmp/ngx_pagespeed/psol/include/out/Release && \
     cp -R pagespeed/automatic/pagespeed_automatic.a /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
@@ -204,7 +203,6 @@ RUN mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
     \
     install -g nginx -o nginx -d \
         "${APP_ROOT}" \
-        "${FILES_DIR}" \
         /etc/nginx/conf.d \
         /var/cache/nginx \
         /var/lib/nginx; \
