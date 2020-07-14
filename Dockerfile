@@ -1,13 +1,11 @@
-ARG BASE_IMAGE_TAG="3.12"
+ARG BASE_IMAGE_TAG=edge
 
 FROM wodby/alpine:${BASE_IMAGE_TAG}
 
 ARG NGINX_VER="1.18.0"
 
 ENV NGINX_VER="${NGINX_VER}" \
-    APP_ROOT="/var/www/html" \
-    FILES_DIR="/mnt/files" \
-    NGINX_VHOST_PRESET="html"
+    APP_ROOT="/var/www/html" 
 
 RUN set -ex; \
     \
@@ -27,9 +25,12 @@ RUN set -ex; \
         sudo; \
     \
     apk add --update --no-cache -t .nginx-build-deps \
+        apache2-dev \
         apr-dev \
         apr-util-dev \
         build-base \
+        curl \
+        gettext-dev \
         gd-dev \
         git \
         gnupg \
@@ -42,6 +43,12 @@ RUN set -ex; \
         libxslt-dev \
         linux-headers \
         pcre-dev \
+        patch \
+        linux-headers \
+        tar \
+        ca-certificates \
+        geoip-dev \
+
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
@@ -101,11 +108,31 @@ RUN set -ex; \
     # Get ngx pagespeed module.
     git clone -b "v${ngx_pagespeed_ver}-stable" \
           --recurse-submodules \
+          --shallow-submodules \
           --depth=1 \
           -c advice.detachedHead=false \
-          -j$(getconf _NPROCESSORS_ONLN) \
+          -j'nproc' \
           https://github.com/apache/incubator-pagespeed-ngx.git \
           /tmp/ngx_pagespeed; \
+    \
+    # Build pagespeed
+    cd /tmp/ngx_pagespeed; \
+    cp patches/modpagespeed/*.patch ./ ;
+RUN for i in *.patch; do printf "\r\nApplying patch ${i%%.*}\r\n"; patch -p1 < $i || exit 1; done
+RUN ./setup.py install; \
+    cd /tmp/ngx_pagespeed; \
+    build/gyp_chromium --depth=. \
+    -D use_system_libs=1 \
+    && \
+    cd /usr/src/modpagespeed/pagespeed/automatic && \
+    make psol BUILDTYPE=Release \
+              CFLAGS+="-I/usr/include/apr-1" \
+              CXXFLAGS+="-I/usr/include/apr-1 -DUCHAR_TYPE=uint16_t" \
+              -j'nproc'; 
+RUN mkdir -p /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
+    mkdir -p /tmp/ngx_pagespeed/psol/include/out/Release && \
+    cp -R pagespeed/automatic/pagespeed_automatic.a /tmp/ngx_pagespeed/psol/lib/Release/linux/x64 && \
+    cp -R net pagespeed testing third_party url /tmp/ngx_pagespeed/psol/include/; \
     \
     # Get psol for alpine.
     url="https://github.com/wodby/nginx-alpine-psol/releases/download/${mod_pagespeed_ver}/psol.tar.gz"; \
@@ -171,8 +198,8 @@ RUN set -ex; \
         --add-dynamic-module=/tmp/ngx_pagespeed \
         --add-dynamic-module=/tmp/ngx_http_modsecurity_module; \
     \
-    make -j$(getconf _NPROCESSORS_ONLN); \
-    make install; \
+    #make -j'nproc'; \
+    make install -j'nproc'; \
     mkdir -p /usr/share/nginx/modules; \
     \
     install -g nginx -o nginx -d \
