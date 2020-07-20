@@ -67,7 +67,6 @@ RUN mkdir -p /usr/src/ngxpagespeed/psol/lib/Release/linux/x64; \
 # Build modsecurity    #
 ########################
 FROM alpine:$ALPINE_VERSION as modsecurity
-ARG nginx_up_ver="0.9.1" 
 ARG ngx_modsecurity_ver="1.0.0" 
 ARG modsecurity_ver="3.0.3" 
 ARG owasp_crs_ver="3.1.0" 
@@ -144,6 +143,7 @@ RUN wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${ow
 ########################################################
 # Build Nginx with support for PageSpeed & Modsecurity #
 ########################################################
+ARG nginx_up_ver="0.9.1" 
 FROM alpine:$ALPINE_VERSION AS nginx
 RUN apk add --no-cache \
     git \
