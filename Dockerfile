@@ -253,8 +253,8 @@ RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
     gpg --trusted-key ${NGINX_PGPKEY} --verify nginx-${NGINX_VERSION}.tar.gz.asc
 
 COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed
-COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/
-COPY --from=modsecurity /usr/local/modsecurity /usr/local/
+COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/ngx_http_modsecurity_module
+COPY --from=modsecurity /usr/local/modsecurity /usr/local/modsecurity
 
 WORKDIR /usr/src/nginx
 
