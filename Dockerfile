@@ -275,6 +275,7 @@ RUN rm -rf /etc/nginx/html/; \
 
 COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY conf/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
 COPY pagespeed.png /usr/share/nginx/html/
 
 
