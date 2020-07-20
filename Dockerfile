@@ -24,6 +24,9 @@ RUN apk add --no-cache \
     pcre-dev \
     py-setuptools \
     patch \
+    python \
+    libpng-dev \
+    libpng \
     zlib-dev;
 
 WORKDIR /usr/src
