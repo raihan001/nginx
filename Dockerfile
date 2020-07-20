@@ -25,7 +25,7 @@ RUN apk add --no-cache \
     py-setuptools \
     patch \
     python3 \
-    python3-setuptools \
+    py3-setuptools \
     libpng-dev \
     libpng \
     zlib-dev;
