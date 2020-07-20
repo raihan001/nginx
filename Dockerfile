@@ -61,10 +61,10 @@ RUN build/gyp_chromium --depth=. -D use_system_libs=1; \
 # Build modsecurity    #
 ########################
 FROM alpine:$ALPINE_VERSION as modsecurity
-ARG nginx_up_ver="0.9.1" \
-    ngx_modsecurity_ver="1.0.0" \
-    modsecurity_ver="3.0.3" \
-    owasp_crs_ver="3.1.0"; 
+ARG nginx_up_ver="0.9.1" 
+ARG ngx_modsecurity_ver="1.0.0" 
+ARG modsecurity_ver="3.0.3" 
+ARG owasp_crs_ver="3.1.0" 
 
 RUN apk add --no-cache \
     autoconf \
