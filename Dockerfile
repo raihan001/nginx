@@ -23,6 +23,7 @@ RUN apk add --no-cache \
     libressl-dev \
     pcre-dev \
     py-setuptools \
+    patch \
     zlib-dev;
 
 WORKDIR /usr/src
