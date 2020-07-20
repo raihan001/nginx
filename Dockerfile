@@ -6,7 +6,7 @@ ARG ALPINE_VERSION=3.8
 FROM alpine:$ALPINE_VERSION as pagespeed
 
 # Check https://github.com/apache/incubator-pagespeed-mod/tags
-ARG MOD_PAGESPEED_TAG=v1.13.35.2
+ARG MOD_PAGESPEED_TAG=v1.14.36.1
 
 RUN apk add --no-cache \
     apache2-dev \
@@ -275,9 +275,9 @@ COPY pagespeed.png /usr/share/nginx/html/
 ##########################################
 FROM alpine:$ALPINE_VERSION
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
-    version.mod-pagespeed="1.13.35.2" \
+    version.mod-pagespeed="v1.14.36.1" \
     version.nginx="1.18.0" \
-    version.ngx-pagespeed="1.13.35.2"
+    version.ngx-pagespeed="v1.14.36.1"
 
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
 COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
