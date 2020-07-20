@@ -156,6 +156,7 @@ COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp
 RUN cd /tmp; \
     git clone https://github.com/google/ngx_brotli.git /tmp/ngx_brotli; \
     cd /tmp/ngx_brotli && git submodule update --init ; \
+    cd /tmp/; \
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
     url="https://github.com/masterzen/nginx-upload-progress-module/archive/v0.9.1.tar.gz"; \
     wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_uploadprogress_module; 
