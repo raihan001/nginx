@@ -254,6 +254,7 @@ RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
 
 COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed
 COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/ngx_http_modsecurity_module
+RUN ls -l /tmp
 COPY --from=modsecurity /usr/local/lib/libmodsecurity.so* /usr/local/lib/
 
 WORKDIR /usr/src/nginx
