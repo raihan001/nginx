@@ -213,7 +213,7 @@ ARG NGINX_BUILD_CONFIG=" \
     --with-pcre-jit \
     --add-module=/tmp/ngx_brotli \
     --add-module=/tmp/ngx_http_uploadprogress_module \
-    --add-dynamic-module=/tmp/ngx_http_modsecurity_module;
+    --add-dynamic-module=/tmp/ngx_http_modsecurity_module";
 
 RUN apk add --no-cache \
     apr-dev \
