@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.8
+ARG ALPINE_VERSION=3.12
 
 ########################
 # Build pagespeed psol #
