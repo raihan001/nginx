@@ -155,6 +155,7 @@ COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp
 # Get ngx uploadprogress & borotli module
 RUN cd /tmp; \
     git clone https://github.com/google/ngx_brotli.git /tmp/ngx_brotli; \
+    cd /tmp/ngx_brotli && git submodule update --init ; \
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
     url="https://github.com/masterzen/nginx-upload-progress-module/archive/v0.9.1.tar.gz"; \
     wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_uploadprogress_module; 
@@ -250,7 +251,7 @@ RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
     gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --keyserver-options timeout=10 --recv-keys $NGINX_PGPKEY} ); \
     gpg --trusted-key ${NGINX_PGPKEY} --verify nginx-${NGINX_VERSION}.tar.gz.asc
 
-COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed/
+COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed
 
 WORKDIR /usr/src/nginx
 
