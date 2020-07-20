@@ -150,9 +150,7 @@ RUN apk add --no-cache \
     tar \
     wget;
 
-COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp
-
-# Get ngx uploadprogress & borotli module
+# Get ngx uploadprogress & brotli module
 RUN cd /tmp; \
     git clone https://github.com/google/ngx_brotli.git /tmp/ngx_brotli; \
     cd /tmp/ngx_brotli && git submodule update --init ; \
