@@ -57,11 +57,11 @@ RUN mkdir -p /usr/src/ngxpagespeed/psol/lib/Release/linux/x64; \
     cp -R out/Release/obj /usr/src/ngxpagespeed/psol/include/out/Release/; \
     cp -R pagespeed/automatic/pagespeed_automatic.a /usr/src/ngxpagespeed/psol/lib/Release/linux/x64/; \
     cp -R net \
-          pagespeed \
-          testing \
-          third_party \
-          url \
-          /usr/src/ngxpagespeed/psol/include/;
+    pagespeed \
+    testing \
+    third_party \
+    url \
+    /usr/src/ngxpagespeed/psol/include/;
 
 ########################
 # Build modsecurity    #
