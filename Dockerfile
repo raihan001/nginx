@@ -274,7 +274,7 @@ RUN rm -rf /etc/nginx/html/; \
     /usr/lib/nginx/modules/*.so;
 
 COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY conf/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY conf/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 COPY pagespeed.png /usr/share/nginx/html/
 
 
@@ -293,9 +293,8 @@ COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
 COPY --from=nginx /etc/nginx /etc/nginx
 COPY --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/
 COPY --from=modsecurity /etc/nginx/modsecurity /etc/nginx/
-COPY --from=modsecurity /usr/local/lib/libmodsecurity.so* /usr/local/lib/
-
-
+COPY --from=nginx /usr/local/modsecurity /usr/local/modsecurity
+RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/
 
 RUN apk --no-cache upgrade; \
     scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
