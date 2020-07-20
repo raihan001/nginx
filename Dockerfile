@@ -24,6 +24,7 @@ RUN apk add --no-cache \
     pcre-dev \
     py-setuptools \
     patch \
+    python2 \
     python3 \
     py3-setuptools \
     libpng-dev \
