@@ -144,7 +144,6 @@ RUN wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${ow
 ########################################################
 # Build Nginx with support for PageSpeed & Modsecurity #
 ########################################################
-ARG nginx_up_ver="0.9.1" 
 FROM alpine:$ALPINE_VERSION AS nginx
 RUN apk add --no-cache \
     git \
@@ -157,7 +156,7 @@ COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp
 RUN cd /tmp; \
     git clone --depth 1 --single-branch https://github.com/google/ngx_brotli; \
     mkdir -p /tmp/ngx_http_uploadprogress_module; \
-    url="https://github.com/masterzen/nginx-upload-progress-module/archive/v${nginx_up_ver}.tar.gz"; \
+    url="https://github.com/masterzen/nginx-upload-progress-module/archive/v0.9.1.tar.gz"; \
     wget -qO- "${url}" | tar xz --strip-components=1 -C /tmp/ngx_http_uploadprogress_module; 
 
 # Check https://github.com/apache/incubator-pagespeed-ngx/tags
