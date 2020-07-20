@@ -35,6 +35,7 @@ RUN git clone -b ${MOD_PAGESPEED_TAG} \
     https://github.com/apache/incubator-pagespeed-mod.git \
     modpagespeed;
 
+WORKDIR /usr/src/modpagespeed
 COPY patches/modpagespeed/*.patch ./
 
 RUN for i in *.patch; do printf "\r\nApplying patch ${i%%.*}\r\n"; patch -p1 < $i || exit 1; done
