@@ -232,8 +232,8 @@ WORKDIR /usr/src
 RUN git clone -b ${NGX_PAGESPEED_TAG} \
     --recurse-submodules \
     --shallow-submodules \
-    --depth=1 -j2\
-    -c advice.detachedHead=false 
+    --depth=1 -j2 \
+    -c advice.detachedHead=false \
     https://github.com/apache/incubator-pagespeed-ngx.git \
     ngxpagespeed;
 
