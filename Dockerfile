@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.12
+ARG ALPINE_VERSION=3.10
 
 ########################
 # Build pagespeed psol #
@@ -24,13 +24,9 @@ RUN apk add --no-cache \
     pcre-dev \
     py-setuptools \
     patch \
-    python2 \
-    python3 \
-    py3-setuptools \
     libpng-dev \
     libpng \
     zlib-dev;
-
 WORKDIR /usr/src
 RUN git clone -b ${MOD_PAGESPEED_TAG} \
     --recurse-submodules \
