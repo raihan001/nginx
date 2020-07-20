@@ -31,10 +31,9 @@ RUN git clone -b ${MOD_PAGESPEED_TAG} \
     --recurse-submodules \
     --depth=1 \
     -c advice.detachedHead=false \
-    -j2 \
+    -j'nproc' \
     https://github.com/apache/incubator-pagespeed-mod.git \
-    modpagespeed; \
-    cd /usr/src/modpagespeed;
+     modpagespeed;
 
 COPY patches/modpagespeed/*.patch ./
 
