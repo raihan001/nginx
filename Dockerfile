@@ -286,7 +286,7 @@ LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
     version.mod-pagespeed="v1.14.36.1" \
     version.nginx="1.18.0" \
     version.ngx-pagespeed="v1.13.35.2"
-
+RUN apk add --no-cache rsync
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
 COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
