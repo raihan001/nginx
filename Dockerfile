@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.10
+ARG ALPINE_VERSION=3.8
 
 ########################
 # Build pagespeed psol #
@@ -150,7 +150,7 @@ RUN apk add --no-cache \
     tar \
     wget;
 
-COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/
+COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp
 
 # Get ngx uploadprogress & borotli module
 RUN cd /tmp; \
@@ -283,7 +283,7 @@ FROM alpine:$ALPINE_VERSION
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
     version.mod-pagespeed="v1.14.36.1" \
     version.nginx="1.18.0" \
-    version.ngx-pagespeed="v1.14.36.1"
+    version.ngx-pagespeed="v1.13.35.2"
 
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
 COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
