@@ -280,6 +280,7 @@ COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
 COPY errors /usr/share/nginx/html/
+COPY pagespeed.png /usr/share/nginx/html/
 
 
 ##########################################
