@@ -278,9 +278,6 @@ COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
-COPY errors /var/www/html/errors
-COPY pagespeed.png /var/www/html/pagespeed.png
-
 
 ##########################################
 # Combine everything with minimal layers #
@@ -302,9 +299,13 @@ COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
 COPY --from=nginx /etc/nginx /etc/nginx
 COPY --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/
 COPY --from=nginx /usr/local/modsecurity /usr/local/modsecurity
+
 RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
     mkdir /var/www /var/www/html;
 COPY conf/nginx/index.html /var/www/html/index.html
+COPY errors /var/www/html/errors
+COPY pagespeed.png /var/www/html/pagespeed.png
+
 RUN apk --no-cache upgrade; \
     scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
     | tr ',' '\n' \
