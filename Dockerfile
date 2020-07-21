@@ -253,6 +253,7 @@ RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
 COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed
 COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/ngx_http_modsecurity_module
 COPY --from=modsecurity /usr/local/modsecurity /usr/local/modsecurity
+COPY --from=modsecurity /etc/nginx/modsecurity /etc/nginx/modsecurity
 
 WORKDIR /usr/src/nginx
 
@@ -292,7 +293,7 @@ RUN apk add --no-cache \
     pcre-dev \
     yajl \
     libmaxminddb;
-    
+
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
 COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
