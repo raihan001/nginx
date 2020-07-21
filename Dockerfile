@@ -275,9 +275,10 @@ RUN rm -rf /etc/nginx/html/; \
     /usr/lib/nginx/modules/*.so;
 
 COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY conf/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
-COPY pagespeed.png /usr/share/nginx/html/
+COPY errors /var/www/html/errors
 
 
 ##########################################
