@@ -267,7 +267,6 @@ RUN tar zxf ../nginx-${NGINX_VERSION}.tar.gz --strip-components=1 -C .; \
 RUN rm -rf /etc/nginx/html/; \
     mkdir /etc/nginx/conf.d/; \
     mkdir -p /usr/share/nginx/html/; \
-    sed -i 's|^</body>|<p><a href="https://www.ngxpagespeed.com/"><img src="pagespeed.png" title="Nginx module for rewriting web pages to reduce latency and bandwidth" /></a></p>\n</body>|' html/index.html; \
     install -m644 html/index.html /usr/share/nginx/html/; \
     install -m644 html/50x.html /usr/share/nginx/html/; \
     ln -s ../../usr/lib/nginx/modules /etc/nginx/modules; \
@@ -279,8 +278,8 @@ COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
-COPY errors /usr/share/nginx/html/
-COPY pagespeed.png /usr/share/nginx/html/
+COPY errors /usr/share/nginx/html/errors
+COPY pagespeed.png /usr/share/nginx/html/pagespeed.png
 
 
 ##########################################
