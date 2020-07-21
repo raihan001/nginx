@@ -317,7 +317,8 @@ RUN apk --no-cache upgrade; \
     install -g nginx -o nginx -d /var/cache/ngx_pagespeed; \
     mkdir -p /var/log/nginx; \
     ln -sf /dev/stdout /var/log/nginx/access.log; \
-    ln -sf /dev/stderr /var/log/nginx/error.log
+    ln -sf /dev/stderr /var/log/nginx/error.log; \
+    chown nginx:nginx /usr/share/nginx/html/ -R;
 
 EXPOSE 80
 
