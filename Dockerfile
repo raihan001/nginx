@@ -202,6 +202,8 @@ RUN set -ex; \
     apk add --no-cache --virtual .nginx-rundeps $runDeps; \
     \
     apk del --purge .nginx-build-deps .nginx-edge-build-deps .libmodsecurity-build-deps; \
+    ln -sf /dev/stdout /var/log/nginx/access.log; \
+    ln -sf /dev/stderr /var/log/nginx/error.log; \
     rm -rf \
         /tmp/* \
         /usr/local/modsecurity \
@@ -222,4 +224,3 @@ EXPOSE 80
 STOPSIGNAL SIGTERM
 
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
-
