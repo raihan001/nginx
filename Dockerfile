@@ -319,10 +319,10 @@ RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/li
     chown nginx:nginx /usr/share/nginx/html/ -R;
 
 RUN rm -rf /tmp/* ; \
-    apk del .build-base; \
-    apk del .build-nginx; \
-    apk del .build-pagespeed; \
-    apk del .build-modsecurity; 
+    apk del .build-base \
+            .build-nginx \
+            .build-pagespeed \
+            .build-modsecurity; 
 
 EXPOSE 80
 
