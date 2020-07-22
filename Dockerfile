@@ -284,7 +284,7 @@ RUN rm -rf /tmp/*
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM alpine:$ALPINE_VERSION
+FROM nginx:1.18.0-alpine
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
     version.mod-pagespeed="v1.14.36.1" \
     version.nginx="1.18.0" \
