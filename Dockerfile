@@ -305,7 +305,6 @@ COPY errors /var/www/html/errors
 COPY pagespeed.png /var/www/html/pagespeed.png
 
 RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
-    mkdir /var/www /var/www/html; \
     scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
     | tr ',' '\n' \
     | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
