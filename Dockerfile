@@ -47,7 +47,7 @@ RUN set -ex; \
         libxslt-dev \
         linux-headers \
         pcre-dev \
-        geoip; \
+        geoip \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
