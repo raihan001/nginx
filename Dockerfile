@@ -8,7 +8,7 @@ FROM alpine:$ALPINE_VERSION as pagespeed
 # Check https://github.com/apache/incubator-pagespeed-mod/tags
 ARG MOD_PAGESPEED_TAG=v1.14.36.1
 
-RUN apk add --no-cache --virtual .build-pagespeed \
+RUN apk add --no-cache \
     apache2-dev \
     apr-dev \
     apr-util-dev \
@@ -72,7 +72,7 @@ ARG ngx_modsecurity_ver="1.0.0"
 ARG modsecurity_ver="3.0.3" 
 ARG owasp_crs_ver="3.1.0" 
 
-RUN apk add --no-cache --virtual .build-modsecurity \
+RUN apk add --no-cache \
     autoconf \
     automake \
     bison \
@@ -145,7 +145,7 @@ RUN wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${ow
 # Build Nginx with support for PageSpeed & Modsecurity #
 ########################################################
 FROM alpine:$ALPINE_VERSION AS nginx
-RUN apk add --no-cache --virtual .build-base \
+RUN apk add --no-cache \
     git \
     tar \
     wget;
@@ -214,7 +214,7 @@ ARG NGINX_BUILD_CONFIG=" \
     --add-module=/tmp/ngx_http_uploadprogress_module \
     --add-dynamic-module=/tmp/ngx_http_modsecurity_module"
 
-RUN apk add --no-cache --virtual .build-nginx \
+RUN apk add --no-cache \
     apr-dev \
     apr-util-dev \
     build-base \
@@ -284,14 +284,13 @@ COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
 ##########################################
 FROM alpine:$ALPINE_VERSION
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
-      version.mod-pagespeed="v1.14.36.1" \
-      version.nginx="1.18.0" \
-      version.ngx-pagespeed="v1.13.35.2"
-      
+    version.mod-pagespeed="v1.14.36.1" \
+    version.nginx="1.18.0" \
+    version.ngx-pagespeed="v1.13.35.2"
 RUN apk add --no-cache \
     rsync \
-    pcre-dev \
-    yajl-dev \
+    pcre \
+    yajl \
     libmaxminddb;
 
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
@@ -299,12 +298,15 @@ COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
 COPY --from=nginx /etc/nginx /etc/nginx
 COPY --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/
-COPY --from=nginx /usr/local/modsecurity /usr/local/modsecurity 
+COPY --from=nginx /usr/local/modsecurity /usr/local/modsecurity
+
+RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
+    mkdir /var/www /var/www/html;
 COPY conf/nginx/index.html /var/www/html/index.html
 COPY errors /var/www/html/errors
 COPY pagespeed.png /var/www/html/pagespeed.png
 
-RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
+RUN apk --no-cache upgrade; \
     scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
     | tr ',' '\n' \
     | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
