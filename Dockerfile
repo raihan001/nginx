@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_TAG=3.8
+ARG BASE_IMAGE_TAG=3.10
 
 FROM alpine:${BASE_IMAGE_TAG}
 
@@ -81,8 +81,8 @@ RUN set -ex; \
     make -j2; \
     make install;  \
     mkdir -p /etc/nginx/modsecurity/; \
-    mv modsecurity.conf-recommended /etc/nginx/modsecurity/recommended.conf;  \
-    sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsecurity/recommended.conf; \
+    mv modsecurity.conf-recommended /etc/nginx/modsecurity/modsecurity.conf;  \
+    sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsecurity/modsecurity.conf; \
     cp unicode.mapping /etc/nginx/modsecurity/; \
     rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
     \
@@ -213,10 +213,10 @@ RUN set -ex; \
         /var/cache/apk/* ;
 
 COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
+COPY conf/nginx/modsecurity/main.conf /etc/nginx/moodsecurity/main.conf
 COPY conf/nginx/index.html /var/www/html/index.html
 COPY errors /var/www/html/errors
 COPY pagespeed.png /var/www/html/pagespeed.png
