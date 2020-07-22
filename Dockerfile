@@ -318,12 +318,6 @@ RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/li
     ln -sf /dev/stderr /var/log/nginx/error.log; \
     chown nginx:nginx /usr/share/nginx/html/ -R;
 
-RUN rm -rf /tmp/* ; \
-    apk del .build-base \
-            .build-nginx \
-            .build-pagespeed \
-            .build-modsecurity; 
-
 EXPOSE 80
 
 STOPSIGNAL SIGTERM
