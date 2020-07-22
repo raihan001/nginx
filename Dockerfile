@@ -282,7 +282,7 @@ COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM nginx:1.18.0
+FROM alpine:$ALPINE_VERSION
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
       version.mod-pagespeed="v1.14.36.1" \
       version.nginx="1.18.0" \
