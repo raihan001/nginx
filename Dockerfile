@@ -1,4 +1,3 @@
-ARG BASE_IMAGE_TAG=3.8
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
     version.alpine="3.8" \
     version.nginx="1.18.0" \
@@ -8,7 +7,7 @@ LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
     version.modsecurity="3.0.3" \
     version.owasp="3.1.0" 
 
-
+ARG BASE_IMAGE_TAG=3.8
 FROM alpine:${BASE_IMAGE_TAG}
 
 ARG NGINX_VER=1.18.0

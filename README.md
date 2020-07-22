@@ -4,7 +4,7 @@ This build of Nginx on Alpine includes:
 
   * [ModSecurity v3](https://github.com/SpiderLabs/ModSecurity) using the [ModSecurity v3 Nginx Connector](https://github.com/SpiderLabs/ModSecurity-nginx) and the [OWASP Core Rule Set](https://github.com/SpiderLabs/owasp-modsecurity-crs)
   * [GeoIP2](https://github.com/leev/ngx_http_geoip2_module) with the [dbip databases](https://db-ip.com/)
-  * a few additional general security features
+  * Pagespeed mo
 
 You can customize this build by changing the files in the ```conf``` directory.
 
