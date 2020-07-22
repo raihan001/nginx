@@ -291,6 +291,7 @@ LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
 RUN apk add --no-cache \
     rsync \
     pcre \
+    yajl \
     libmaxminddb;
 
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
