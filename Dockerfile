@@ -68,9 +68,10 @@ RUN mkdir -p /usr/src/ngxpagespeed/psol/lib/Release/linux/x64; \
 # Build modsecurity    #
 ########################
 FROM alpine:$ALPINE_VERSION as modsecurity
-ARG ngx_modsecurity_ver="1.0.0" 
-ARG modsecurity_ver="3.0.3" 
-ARG owasp_crs_ver="3.1.0" 
+
+ARG ngx_modsecurity_ver="1.0.0"; \
+    modsecurity_ver="3.0.3"; \
+    owasp_crs_ver="3.1.0";
 
 RUN apk add --no-cache --virtual .build-modsecurity \
     autoconf \
@@ -250,10 +251,10 @@ RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
     gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --keyserver-options timeout=10 --recv-keys $NGINX_PGPKEY} ); \
     gpg --trusted-key ${NGINX_PGPKEY} --verify nginx-${NGINX_VERSION}.tar.gz.asc
 
-COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed
-COPY --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/ngx_http_modsecurity_module
-COPY --from=modsecurity /usr/local/modsecurity /usr/local/modsecurity
-COPY --from=modsecurity /etc/nginx/modsecurity /etc/nginx/modsecurity
+COPY --from=pagespeed /usr/src/ngxpagespeed /usr/src/ngxpagespeed; \
+     --from=modsecurity /usr/src/ngx_http_modsecurity_module /tmp/ngx_http_modsecurity_module; \
+     --from=modsecurity /usr/local/modsecurity /usr/local/modsecurity; \
+     --from=modsecurity /etc/nginx/modsecurity /etc/nginx/modsecurity;
 
 WORKDIR /usr/src/nginx
 
@@ -273,11 +274,11 @@ RUN rm -rf /etc/nginx/html/; \
     strip /usr/sbin/nginx* \
     /usr/lib/nginx/modules/*.so;
 
-COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY conf/nginx/conf.d /etc/nginx/conf.d
-COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
-COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
+COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf; \
+     conf/nginx/nginx.conf /etc/nginx/nginx.conf; \
+     conf/nginx/conf.d /etc/nginx/conf.d; \
+     conf/nginx/sites-enabled /etc/nginx/sites-enabled; \
+     conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf;
 
 ##########################################
 # Combine everything with minimal layers #
@@ -292,20 +293,19 @@ RUN apk add --no-cache \
     pcre \
     libmaxminddb;
 
-COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
-COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
-COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
-COPY --from=nginx /etc/nginx /etc/nginx
-COPY --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/
-COPY --from=nginx /usr/local/modsecurity /usr/local/modsecurity
+COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin; \
+     --from=nginx /usr/sbin/nginx /usr/sbin/nginx; \
+     --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/; \
+     --from=nginx /etc/nginx /etc/nginx; \
+     --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/; \
+     --from=nginx /usr/local/modsecurity /usr/local/modsecurity; \
+     conf/nginx/index.html /var/www/html/index.html; \
+     errors /var/www/html/errors; \
+     pagespeed.png /var/www/html/pagespeed.png;
 
 RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
-    mkdir /var/www /var/www/html;
-COPY conf/nginx/index.html /var/www/html/index.html
-COPY errors /var/www/html/errors
-COPY pagespeed.png /var/www/html/pagespeed.png
-
-RUN scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
+    mkdir /var/www /var/www/html; \
+    scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
     | tr ',' '\n' \
     | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     | xargs apk add --no-cache; \
@@ -329,4 +329,3 @@ EXPOSE 80
 STOPSIGNAL SIGTERM
 
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
-
