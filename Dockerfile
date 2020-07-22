@@ -8,7 +8,7 @@ FROM alpine:$ALPINE_VERSION as pagespeed
 # Check https://github.com/apache/incubator-pagespeed-mod/tags
 ARG MOD_PAGESPEED_TAG=v1.14.36.1
 
-RUN apk add --no-cache --virtual .build-pagespeed \
+RUN apk add --no-cache --virtual .build-pagespeed; \
     apache2-dev \
     apr-dev \
     apr-util-dev \
@@ -51,8 +51,9 @@ RUN build/gyp_chromium --depth=. \
     make psol BUILDTYPE=Release \
     CFLAGS+="-I/usr/include/apr-1" \
     CXXFLAGS+="-I/usr/include/apr-1 -DUCHAR_TYPE=uint16_t" \
-    -j2; \
-    mkdir -p /usr/src/ngxpagespeed/psol/lib/Release/linux/x64; \
+    -j2;
+
+RUN mkdir -p /usr/src/ngxpagespeed/psol/lib/Release/linux/x64; \
     mkdir -p /usr/src/ngxpagespeed/psol/include/out/Release; \
     cp -R out/Release/obj /usr/src/ngxpagespeed/psol/include/out/Release/; \
     cp -R pagespeed/automatic/pagespeed_automatic.a /usr/src/ngxpagespeed/psol/lib/Release/linux/x64/; \
@@ -61,7 +62,7 @@ RUN build/gyp_chromium --depth=. \
     testing \
     third_party \
     url \
-    /usr/src/ngxpagespeed/psol/include/;  
+    /usr/src/ngxpagespeed/psol/include/;
 
 ########################
 # Build modsecurity    #
@@ -71,7 +72,7 @@ ARG ngx_modsecurity_ver="1.0.0"
 ARG modsecurity_ver="3.0.3" 
 ARG owasp_crs_ver="3.1.0" 
 
-RUN apk add --no-cache --virtual .build-modsecurity\
+RUN apk add --no-cache --virtual .build-modsecurity;\
     autoconf \
     automake \
     bison \
@@ -139,17 +140,18 @@ RUN wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${ow
     mv crs-setup.conf.example /etc/nginx/modsecurity/crs/setup.conf; \
     mv rules /etc/nginx/modsecurity/crs; 
 
+
 ########################################################
 # Build Nginx with support for PageSpeed & Modsecurity #
 ########################################################
 FROM alpine:$ALPINE_VERSION AS nginx
-
-# Get ngx uploadprogress & brotli module
-RUN apk add --no-cache --virtual .build-base \
+RUN apk add --no-cache --virtual .build-base; \
     git \
     tar \
-    wget; \
-    cd /tmp; \
+    wget;
+
+# Get ngx uploadprogress & brotli module
+RUN cd /tmp; \
     git clone https://github.com/google/ngx_brotli.git /tmp/ngx_brotli; \
     cd /tmp/ngx_brotli && git submodule update --init ; \
     cd /tmp/; \
@@ -212,7 +214,7 @@ ARG NGINX_BUILD_CONFIG=" \
     --add-module=/tmp/ngx_http_uploadprogress_module \
     --add-dynamic-module=/tmp/ngx_http_modsecurity_module"
 
-RUN apk add --no-cache --virtual .build-nginx \
+RUN apk add --no-cache --virtual .build-nginx; \
     apr-dev \
     apr-util-dev \
     build-base \
@@ -271,47 +273,39 @@ RUN rm -rf /etc/nginx/html/; \
     strip /usr/sbin/nginx* \
     /usr/lib/nginx/modules/*.so;
 
-COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf; \
-     conf/nginx/nginx.conf /etc/nginx/nginx.conf; \
-     conf/nginx/conf.d /etc/nginx/conf.d; \
-     conf/nginx/sites-enabled /etc/nginx/sites-enabled; \
-     conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
-
-RUN rm -rf /tmp/* ; \
-    apk del .build-base; \
-    apk del .build-nginx; \
-    apk del .build-pagespeed; \
-    RUN apk del .build-modsecurity; 
+COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx/conf.d /etc/nginx/conf.d
+COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
+COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM nginx:1.18.0-alpine
+FROM nginx:1.18.0
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
       version.mod-pagespeed="v1.14.36.1" \
       version.nginx="1.18.0" \
       version.ngx-pagespeed="v1.13.35.2"
+RUN apk add --no-cache \
+    rsync \
+    pcre \
+    libmaxminddb;
 
-COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin; \
-     --from=nginx /usr/sbin/nginx /usr/sbin/nginx; \
-     --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/; \
-     --from=nginx /etc/nginx /etc/nginx; \
-     --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/; \
-     --from=nginx /usr/local/modsecurity /usr/local/modsecurity; \
-     conf/nginx/index.html /var/www/html/index.html; \
-     errors /var/www/html/errors; \
-     pagespeed.png /var/www/html/pagespeed.png
+COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
+COPY --from=nginx /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=nginx /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
+COPY --from=nginx /etc/nginx /etc/nginx
+COPY --from=nginx /usr/share/nginx/html/ /usr/share/nginx/html/
+COPY --from=nginx /usr/local/modsecurity /usr/local/modsecurity
 
 RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
     mkdir /var/www /var/www/html;
+COPY conf/nginx/index.html /var/www/html/index.html
+COPY errors /var/www/html/errors
+COPY pagespeed.png /var/www/html/pagespeed.png
 
-RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/lib/; \
-    mkdir /var/www /var/www/html; \
-    apk add --no-cache \
-    rsync \
-    pcre \
-    libmaxminddb; \
-    scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
+RUN scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
     | tr ',' '\n' \
     | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     | xargs apk add --no-cache; \
@@ -323,6 +317,12 @@ RUN rsync -a --links /usr/local/modsecurity/lib/libmodsecurity.so* /usr/local/li
     ln -sf /dev/stdout /var/log/nginx/access.log; \
     ln -sf /dev/stderr /var/log/nginx/error.log; \
     chown nginx:nginx /usr/share/nginx/html/ -R;
+
+RUN rm -rf /tmp/* ; \
+    apk del .build-base; \
+    apk del .build-nginx; \
+    apk del .build-pagespeed; \
+    RUN apk del .build-modsecurity; 
 
 EXPOSE 80
 
