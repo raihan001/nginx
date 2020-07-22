@@ -130,12 +130,14 @@ RUN set -ex; \
     \
     cd "/tmp/nginx-${NGINX_VER}"; \
     ./configure \
-        --prefix=/usr/share/nginx \
+        --prefix=/etc/nginx \
         --sbin-path=/usr/sbin/nginx \
         --modules-path=/usr/lib/nginx/modules \
         --conf-path=/etc/nginx/nginx.conf \
-        --pid-path=/var/run/nginx/nginx.pid \
-        --lock-path=/var/run/nginx/nginx.lock \
+        --error-log-path=/var/log/nginx/error.log \
+        --http-log-path=/var/log/nginx/access.log \
+        --pid-path=/var/run/nginx.pid \
+        --lock-path=/var/run/nginx.lock \
         --http-client-body-temp-path=/var/cache/nginx/client_temp \
         --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
         --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
@@ -151,17 +153,18 @@ RUN set -ex; \
         --with-http_flv_module \
         --with-http_gunzip_module \
         --with-http_gzip_static_module \
-		--with-http_image_filter_module=dynamic \
+        --with-http_image_filter_module=dynamic \
+        --with-http_geoip_module=dynamic \
         --with-http_mp4_module \
         --with-http_random_index_module \
         --with-http_realip_module \
         --with-http_secure_link_module \
-		--with-http_slice_module \
+        --with-http_slice_module \
         --with-http_ssl_module \
         --with-http_stub_status_module \
         --with-http_sub_module \
         --with-http_v2_module \
-		--with-http_xslt_module=dynamic \
+        --with-http_xslt_module=dynamic \
         --with-ipv6 \
         --with-ld-opt="-Wl,-z,relro,--start-group -lapr-1 -laprutil-1 -licudata -licuuc -lpng -lturbojpeg -ljpeg" \
         --with-mail \
@@ -169,8 +172,8 @@ RUN set -ex; \
         --with-pcre-jit \
         --with-stream \
         --with-stream_ssl_module \
-		--with-stream_ssl_preread_module \
-		--with-stream_realip_module \
+        --with-stream_ssl_preread_module \
+        --with-stream_realip_module \
         --with-threads \
         --add-module=/tmp/ngx_http_uploadprogress_module \
         --add-module=/tmp/ngx_brotli \
@@ -193,13 +196,13 @@ RUN set -ex; \
     \
     for i in /usr/lib/nginx/modules/*.so; do ln -s "${i}" /usr/share/nginx/modules/; done; \
     \
-	runDeps="$( \
-		scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/local/modsecurity/lib/*.so /usr/lib/nginx/modules/*.so /tmp/envsubst \
-			| tr ',' '\n' \
-			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)"; \
-	apk add --no-cache --virtual .nginx-rundeps $runDeps; \
+    runDeps="$( \
+        scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/local/modsecurity/lib/*.so /usr/lib/nginx/modules/*.so /tmp/envsubst \
+            | tr ',' '\n' \
+            | sort -u \
+            | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+    )"; \
+    apk add --no-cache --virtual .nginx-rundeps $runDeps; \
     \
     apk del --purge .nginx-build-deps .nginx-edge-build-deps .libmodsecurity-build-deps; \
     rm -rf \
