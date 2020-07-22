@@ -8,7 +8,7 @@ FROM alpine:$ALPINE_VERSION as pagespeed
 # Check https://github.com/apache/incubator-pagespeed-mod/tags
 ARG MOD_PAGESPEED_TAG=v1.14.36.1
 
-RUN apk add --no-cache --virtual .build-pagespeed; \
+RUN apk add --no-cache --virtual .build-pagespeed \
     apache2-dev \
     apr-dev \
     apr-util-dev \
@@ -72,7 +72,7 @@ ARG ngx_modsecurity_ver="1.0.0"
 ARG modsecurity_ver="3.0.3" 
 ARG owasp_crs_ver="3.1.0" 
 
-RUN apk add --no-cache --virtual .build-modsecurity;\
+RUN apk add --no-cache --virtual .build-modsecurity \
     autoconf \
     automake \
     bison \
@@ -145,7 +145,7 @@ RUN wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${ow
 # Build Nginx with support for PageSpeed & Modsecurity #
 ########################################################
 FROM alpine:$ALPINE_VERSION AS nginx
-RUN apk add --no-cache --virtual .build-base; \
+RUN apk add --no-cache --virtual .build-base \
     git \
     tar \
     wget;
@@ -214,7 +214,7 @@ ARG NGINX_BUILD_CONFIG=" \
     --add-module=/tmp/ngx_http_uploadprogress_module \
     --add-dynamic-module=/tmp/ngx_http_modsecurity_module"
 
-RUN apk add --no-cache --virtual .build-nginx; \
+RUN apk add --no-cache --virtual .build-nginx \
     apr-dev \
     apr-util-dev \
     build-base \
