@@ -189,7 +189,7 @@ RUN set -ex; \
     \
     install -m 400 -d /etc/nginx/pki; \
     strip /usr/sbin/nginx*; \
-    ln -s /usr/lib/nginx/modules /etc/nginx/modules;
+    ln -s /usr/lib/nginx/modules /etc/nginx/modules; \
     strip /usr/lib/nginx/modules/*.so; \
     strip /usr/local/lib/libmodsecurity.so*; \
     \
