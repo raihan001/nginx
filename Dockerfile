@@ -61,8 +61,7 @@ RUN build/gyp_chromium --depth=. \
     testing \
     third_party \
     url \
-    /usr/src/ngxpagespeed/psol/include/; \
-    apk del .build-pagespeed; 
+    /usr/src/ngxpagespeed/psol/include/;  
 
 ########################
 # Build modsecurity    #
@@ -139,8 +138,6 @@ RUN wget -qO- "https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v${ow
     mkdir -p /etc/nginx/modsecurity/crs/; \
     mv crs-setup.conf.example /etc/nginx/modsecurity/crs/setup.conf; \
     mv rules /etc/nginx/modsecurity/crs; 
-
-RUN apk del .build-modsecurity; 
 
 ########################################################
 # Build Nginx with support for PageSpeed & Modsecurity #
@@ -282,7 +279,9 @@ COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf; \
 
 RUN rm -rf /tmp/* ; \
     apk del .build-base; \
-    apk del .build-nginx;
+    apk del .build-nginx; \
+    apk del .build-pagespeed; \
+    RUN apk del .build-modsecurity; 
 
 ##########################################
 # Combine everything with minimal layers #
