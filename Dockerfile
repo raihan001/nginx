@@ -322,7 +322,7 @@ RUN rm -rf /tmp/* ; \
     apk del .build-base; \
     apk del .build-nginx; \
     apk del .build-pagespeed; \
-    RUN apk del .build-modsecurity; 
+    apk del .build-modsecurity; 
 
 EXPOSE 80
 
