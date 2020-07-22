@@ -225,7 +225,7 @@ COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
-COPY conf/nginx/modsecurity/main.conf /etc/nginx/moodsecurity/main.conf
+COPY conf/nginx/modsecurity/main.conf /etc/nginx/modsecurity/main.conf
 COPY conf/nginx/index.html /var/www/html/index.html
 COPY errors /var/www/html/errors
 COPY pagespeed.png /var/www/html/pagespeed.png
