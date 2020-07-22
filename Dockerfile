@@ -279,6 +279,8 @@ COPY conf/nginx/conf.d /etc/nginx/conf.d
 COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
 COPY conf/nginx/modules/modules.conf /etc/nginx/modules/modules.conf
 
+RUN rm -rf /tmp/*
+
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
@@ -289,8 +291,7 @@ LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
     version.ngx-pagespeed="v1.13.35.2"
 RUN apk add --no-cache \
     rsync \
-    pcre-dev \
-    yajl \
+    pcre \
     libmaxminddb;
 
 COPY --from=pagespeed /usr/bin/envsubst /usr/local/bin
@@ -306,8 +307,7 @@ COPY conf/nginx/index.html /var/www/html/index.html
 COPY errors /var/www/html/errors
 COPY pagespeed.png /var/www/html/pagespeed.png
 
-RUN apk --no-cache upgrade; \
-    scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
+RUN scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /usr/local/bin/envsubst \
     | tr ',' '\n' \
     | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     | xargs apk add --no-cache; \
