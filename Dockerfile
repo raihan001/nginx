@@ -183,6 +183,7 @@ RUN set -ex; \
     make install; \
     \
     install -g nginx -o nginx -d \
+        /var/cache/nginx \
         /var/cache/ngx_pagespeed \
         /pagespeed_static \
         /ngx_pagespeed_beacon; \
