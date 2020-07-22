@@ -193,8 +193,6 @@ RUN set -ex; \
     strip /usr/lib/nginx/modules/*.so; \
     strip /usr/local/lib/libmodsecurity.so*; \
     \
-    for i in /usr/lib/nginx/modules/*.so; do ln -s "${i}" /usr/share/nginx/modules/; done; \
-    \
     runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/local/modsecurity/lib/*.so /usr/lib/nginx/modules/*.so /tmp/envsubst \
             | tr ',' '\n' \
