@@ -106,7 +106,7 @@ RUN set -ex; \
     mv rules /etc/nginx/modsecurity/crs; \
     \
     # Get ngx pagespeed module.
-    git clone -b "v${ngx_pagespeed_ver}" \
+    git clone -b "v${ngx_pagespeed_ver}-stable" \
           --recurse-submodules \
           --shallow-submodules \
           --depth=100 \
