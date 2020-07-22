@@ -3,7 +3,7 @@ ARG BASE_IMAGE_TAG=3.8
 FROM alpine:${BASE_IMAGE_TAG}
 
 LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
-    version.alpine="3.8"
+    version.alpine="3.8" \
     version.nginx="1.18.0" \
     version.mod-pagespeed="v1.13.35.2" \
     version.ngx-pagespeed="v1.13.35.2" \
