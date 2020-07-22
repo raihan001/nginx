@@ -69,9 +69,9 @@ RUN mkdir -p /usr/src/ngxpagespeed/psol/lib/Release/linux/x64; \
 ########################
 FROM alpine:$ALPINE_VERSION as modsecurity
 
-ARG ngx_modsecurity_ver="1.0.0"; \
-    modsecurity_ver="3.0.3"; \
-    owasp_crs_ver="3.1.0";
+ARG ngx_modsecurity_ver="1.0.0" 
+ARG modsecurity_ver="3.0.3" 
+ARG owasp_crs_ver="3.1.0"
 
 RUN apk add --no-cache --virtual .build-modsecurity \
     autoconf \
