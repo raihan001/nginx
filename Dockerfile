@@ -173,6 +173,7 @@ RUN set -ex; \
         --with-stream_ssl_module \
         --with-stream_ssl_preread_module \
         --with-stream_realip_module \
+        --with-stream_geoip_module=dynamic \
         --with-threads \
         --add-module=/tmp/ngx_http_uploadprogress_module \
         --add-module=/tmp/ngx_brotli \
