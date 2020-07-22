@@ -29,6 +29,7 @@ RUN set -ex; \
         gzip \
         tar \
         unzip \
+        geoip-dev \
         wget; \
     \
     apk add --update --no-cache -t .nginx-build-deps \
@@ -47,7 +48,6 @@ RUN set -ex; \
         libxslt-dev \
         linux-headers \
         pcre-dev \
-        geoip \
         zlib-dev; \
      \
      apk add --no-cache -t .libmodsecurity-build-deps \
